@@ -696,8 +696,10 @@ static int process_client(struct tracecmd_msg_handle *msg_handle,
 	ofd = create_client_file(node, port);
 
 	pid_array = create_all_readers(node, port, pagesize, msg_handle);
-	if (!pid_array)
+	if (!pid_array) {
+		close(ofd);
 		return -ENOMEM;
+	}
 
 	/* on signal stop this msg */
 	stop_msg_handle = msg_handle;
@@ -725,6 +727,7 @@ static int process_client(struct tracecmd_msg_handle *msg_handle,
 					msg_handle->version < V3_PROTOCOL);
 
 	destroy_all_readers(cpus, pid_array, node, port);
+	close(ofd);
 
 	return ret;
 }
