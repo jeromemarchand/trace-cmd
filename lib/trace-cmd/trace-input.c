@@ -4030,7 +4030,7 @@ static int handle_options(struct tracecmd_input *handle)
 		}
 		ret = do_read_check(handle, buf, size);
 		if (ret)
-			goto out;
+			goto out_free;
 
 		switch (option) {
 		case TRACECMD_OPTION_DATE:
@@ -4084,7 +4084,7 @@ static int handle_options(struct tracecmd_input *handle)
 							     buf + 8, 4);
 			ret = tsync_cpu_offsets_load(handle, buf + 12, size - 12);
 			if (ret < 0)
-				goto out;
+				goto out_free;
 			tracecmd_enable_tsync(handle, true);
 			break;
 		case TRACECMD_OPTION_CPUSTAT:
@@ -4093,7 +4093,7 @@ static int handle_options(struct tracecmd_input *handle)
 					   handle->cpustats_size + size + 1);
 			if (!cpustats) {
 				ret = -ENOMEM;
-				goto out;
+				goto out_free;
 			}
 			memcpy(cpustats + handle->cpustats_size, buf, size);
 			handle->cpustats_size += size;
@@ -4104,7 +4104,7 @@ static int handle_options(struct tracecmd_input *handle)
 		case TRACECMD_OPTION_BUFFER_TEXT:
 			ret = handle_buffer_option(handle, option, buf, size);
 			if (ret < 0)
-				goto out;
+				goto out_free;
 			break;
 		case TRACECMD_OPTION_TRACECLOCK:
 			tracecmd_parse_trace_clock(handle, buf, size);
@@ -4183,6 +4183,8 @@ static int handle_options(struct tracecmd_input *handle)
 
 	ret = 0;
 
+out_free:
+	free(buf);
 out:
 	if (compress)
 		in_uncompress_reset(handle);
