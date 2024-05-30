@@ -955,7 +955,8 @@ create_event_list_item(struct tracecmd_output *handle,
 	free(str);
 	return;
  err_mem:
-	 tracecmd_warning("Insufficient memory");
+	free(ptr);
+	tracecmd_warning("Insufficient memory");
 }
 
 static int read_ftrace_files(struct tracecmd_output *handle, bool compress)
