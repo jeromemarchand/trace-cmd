@@ -2364,13 +2364,16 @@ static void show_error(const char *file, const char *type)
 			goto read_file;
 		}
 		read_error_log(p);
+		free(p);
 		goto out;
 	}
 
  read_file:
 	p = read_file(path);
-	if (p)
+	if (p) {
 		printf("%s", p);
+		free(p);
+	}
 
  out:
 	printf("Failed %s of %s\n", type, file);
