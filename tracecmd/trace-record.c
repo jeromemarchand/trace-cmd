@@ -3903,6 +3903,7 @@ again:
 
 	if (sfd < 0) {
 		free(thost);
+		free(msg_handle);
 		return NULL;
 	}
 
