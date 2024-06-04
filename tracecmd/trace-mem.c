@@ -555,9 +555,10 @@ void trace_mem(int argc, char **argv)
 
 	ret = tracecmd_read_headers(handle, 0);
 	if (ret)
-		return;
+		goto out;
 
 	do_trace_mem(handle);
 
+out:
 	tracecmd_close(handle);
 }
