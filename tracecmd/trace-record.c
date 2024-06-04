@@ -6909,6 +6909,8 @@ static void parse_record_options(int argc,
 		}
 	}
 
+	if (ctx->instance->delete)
+		die("Instance to be deleted is still used");
 	remove_instances(del_list);
 
 	/* If --date is specified, prepend it to all guest VM flags */
