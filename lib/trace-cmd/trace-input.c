@@ -447,7 +447,7 @@ static char *read_string(struct tracecmd_input *handle)
 		str = realloc(str, size);
 		if (!str)
 			return NULL;
-		memcpy(str + (size - i), buf, i + 1);
+		memcpy(str + (size - i - 1), buf, i + 1);
 	} else {
 		size = i + 1;
 		str = malloc(size);
