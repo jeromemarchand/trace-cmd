@@ -3702,7 +3702,7 @@ static void trace_guests_free(struct tracecmd_input *handle)
 static int trace_guest_load(struct tracecmd_input *handle, char *buf, int size)
 {
 	struct guest_trace_info *guest = NULL;
-	int cpu;
+	unsigned int cpu;
 	int i;
 
 	guest = calloc(1, sizeof(struct guest_trace_info));
