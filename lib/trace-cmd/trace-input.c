@@ -969,6 +969,8 @@ static int read_proc_kallsyms(struct tracecmd_input *handle)
 		handle->file_state = TRACECMD_FILE_KALLSYMS;
 		return 0; /* OK? */
 	}
+	if (size >= UINT_MAX)
+		return -1;
 
 	buf = malloc(size+1);
 	if (!buf)
