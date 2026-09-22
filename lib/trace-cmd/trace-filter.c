@@ -35,6 +35,9 @@ static bool test_stacktrace(struct tracecmd_filter *filter, struct tep_record *r
 	if (id != stacktrace_id)
 		return false;
 
+	if(record->cpu >= filter->nr_cpus)
+		return false;
+
 	return filter->last_printed[record->cpu];
 }
 
@@ -112,7 +115,7 @@ tcmd_filter_match(struct tracecmd_filter *filter, struct tep_record *record)
 			break;
 	}
 
-	if (filter->last_printed)
+	if (filter->last_printed && record->cpu < filter->nr_cpus)
 		filter->last_printed[record->cpu] = !is_stack && !found;
 
 	return found ? TRACECMD_FILTER_MISS : TRACECMD_FILTER_MATCH;
