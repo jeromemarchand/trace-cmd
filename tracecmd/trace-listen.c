@@ -465,6 +465,7 @@ static int communicate_with_client(struct tracecmd_msg_handle *msg_handle)
 				s = size - t;
 			} while (t);
 
+			option[size - 1] = '\0';
 			s = process_option(msg_handle, option);
 			free(option);
 			/* do we understand this option? */
