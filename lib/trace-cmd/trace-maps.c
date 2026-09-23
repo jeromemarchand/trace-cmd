@@ -169,6 +169,8 @@ struct tracecmd_cpu_map *tracecmd_get_cpu_map(struct tracecmd_input *handle, int
 	int cnt;
 
 	map = tcmd_get_guest_map(handle);
+	if (!map)
+		return NULL;
 	/* Make sure it's for the guest handle, as this could be a host handle */
 	map = map->self;
 	cnt = tcmd_get_guest_map_cnt(map->guest_handle);
