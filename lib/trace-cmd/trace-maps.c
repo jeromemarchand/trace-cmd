@@ -81,7 +81,7 @@ int tracecmd_map_vcpus(struct tracecmd_input **handles, int nr_handles)
 		map = realloc(vcpu_maps, sizeof(*map) * (nr_vcpu_maps + vcpu_count));
 		if (!map)
 			goto fail;
-		memset(map + nr_vcpu_maps, 0, sizeof(*map) * (vcpu_count - nr_vcpu_maps));
+		memset(map + nr_vcpu_maps, 0, sizeof(*map) * vcpu_count);
 
 		vcpu_maps = map;
 		map += nr_vcpu_maps;
