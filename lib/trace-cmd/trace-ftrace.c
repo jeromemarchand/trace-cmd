@@ -104,6 +104,7 @@ static int function_handler(struct trace_seq *s, struct tep_record *record,
 }
 
 #define TRACE_GRAPH_INDENT		2
+#define TRACE_GRAPH_MAX_DEPTH		1024
 
 static struct tep_record *
 get_return_for_leaf(struct trace_seq *s, int cpu, int cur_pid,
@@ -274,6 +275,10 @@ print_graph_entry_leaf(struct trace_seq *s,
 	if (tep_get_field_val(s, event, "depth", record, &depth, 1))
 		return trace_seq_putc(s, '!');
 
+	/* Limit depth to prevent DoS attack */
+	if (depth > TRACE_GRAPH_MAX_DEPTH)
+		depth = TRACE_GRAPH_MAX_DEPTH;
+
 	/* Function */
 	for (i = 0; i < (int)(depth * TRACE_GRAPH_INDENT); i++)
 		trace_seq_putc(s, ' ');
@@ -334,6 +339,10 @@ static int print_graph_nested(struct trace_seq *s,
 
 	if (tep_get_field_val(s, event, "depth", record, &depth, 1))
 		return trace_seq_putc(s, '!');
+
+	/* Limit depth to prevent DoS attack */
+	if (depth > TRACE_GRAPH_MAX_DEPTH)
+		depth = TRACE_GRAPH_MAX_DEPTH;
 
 	/* In case this is a retaddr event */
 	if (!tep_get_field_val(s, event, "retaddr", record, &val, 0)) {
@@ -452,6 +461,10 @@ fgraph_ret_handler(struct trace_seq *s, struct tep_record *record,
 
 	if (tep_get_field_val(s, event, "depth", record, &depth, 1))
 		return trace_seq_putc(s, '!');
+
+	/* Limit depth to prevent DoS attack */
+	if (depth > TRACE_GRAPH_MAX_DEPTH)
+		depth = TRACE_GRAPH_MAX_DEPTH;
 
 	/* Function */
 	for (i = 0; i < (int)(depth * TRACE_GRAPH_INDENT); i++)
