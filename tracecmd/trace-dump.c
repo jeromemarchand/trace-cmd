@@ -70,7 +70,7 @@ enum dump_items verbosity;
 			tracecmd_plog(fmt, ##__VA_ARGS__);	\
 	} while (0)
 
-static int read_fd(int fd, char *dst, int len)
+static int read_fd(int fd, char *dst, size_t len)
 {
 	size_t size = 0;
 	int r;
@@ -89,7 +89,7 @@ static int read_fd(int fd, char *dst, int len)
 	return size;
 }
 
-static int read_compressed(int fd, char *dst, int len)
+static int read_compressed(int fd, char *dst, size_t len)
 {
 
 	if (read_compress)
@@ -127,7 +127,7 @@ static int read_file_string(int fd, char *dst, int len)
 	return 0;
 }
 
-static int read_file_bytes(int fd, char *dst, int len)
+static int read_file_bytes(int fd, char *dst, size_t len)
 {
 	int ret;
 
@@ -135,15 +135,15 @@ static int read_file_bytes(int fd, char *dst, int len)
 	return ret < 0 ? ret : 0;
 }
 
-static void read_dump_string(int fd, int size, enum dump_items id)
+static void read_dump_string(int fd, unsigned int size, enum dump_items id)
 {
 	char buf[DUMP_SIZE];
-	int lsize;
+	unsigned int lsize;
 
 	while (size) {
 		lsize = (size < DUMP_SIZE) ? size : DUMP_SIZE - 1;
 		if (read_file_bytes(fd, buf, lsize))
-			die("cannot read %d bytes", lsize);
+			die("cannot read %u bytes", lsize);
 		buf[lsize] = 0;
 		do_print(id, "%s", buf);
 		size -= lsize;
@@ -152,7 +152,7 @@ static void read_dump_string(int fd, int size, enum dump_items id)
 	do_print(id, "\n");
 }
 
-static int read_file_number(int fd, void *digit, int size)
+static int read_file_number(int fd, void *digit, unsigned int size)
 {
 	unsigned long long val;
 	char buf[8];
@@ -449,9 +449,9 @@ static void dump_cpus_count(int fd)
 	do_print(SUMMARY, "\t%d [CPUs with tracing data]\n", trace_cpus);
 }
 
-static void dump_option_string(int fd, int size, char *desc)
+static void dump_option_string(int fd, unsigned int size, char *desc)
 {
-	do_print(OPTIONS, "\t\t[Option %s, %d bytes]\n", desc, size);
+	do_print(OPTIONS, "\t\t[Option %s, %u bytes]\n", desc, size);
 	if (size)
 		read_dump_string(fd, size, OPTIONS);
 }
@@ -488,7 +488,7 @@ static void dump_section_header(int fd, enum dump_items v, unsigned short *flags
 		*flags = fl;
 }
 
-static void dump_option_buffer(int fd, unsigned short option, int size)
+static void dump_option_buffer(int fd, unsigned short option, unsigned int size)
 {
 	unsigned long long total_size = 0;
 	unsigned long long data_size;
@@ -503,7 +503,7 @@ static void dump_option_buffer(int fd, unsigned short option, int size)
 	int i;
 
 	if (size < 8)
-		die("broken buffer option with size %d", size);
+		die("broken buffer option with size %u", size);
 
 	if (read_file_number(fd, &offset, 8))
 		die("cannot read the offset of the buffer option");
@@ -512,7 +512,7 @@ static void dump_option_buffer(int fd, unsigned short option, int size)
 		die("cannot read the name of the buffer option");
 
 	if (file_version < FILE_VERSION_SECTIONS) {
-		do_print(OPTIONS|FLYRECORD, "\t\t[Option BUFFER, %d bytes]\n", size);
+		do_print(OPTIONS|FLYRECORD, "\t\t[Option BUFFER, %u bytes]\n", size);
 		do_print(OPTIONS|FLYRECORD, "%lld [offset]\n", offset);
 		do_print(OPTIONS|FLYRECORD, "\"%s\" [name]\n", name);
 		return;
@@ -527,7 +527,7 @@ static void dump_option_buffer(int fd, unsigned short option, int size)
 	if (lseek(fd, current, SEEK_SET) == (off_t)-1)
 		die("cannot go back to buffer option");
 
-	do_print(OPTIONS|FLYRECORD, "\t\t[Option BUFFER, %d bytes]\n", size);
+	do_print(OPTIONS|FLYRECORD, "\t\t[Option BUFFER, %u bytes]\n", size);
 	do_print(OPTIONS|FLYRECORD, "%lld [offset]\n", offset);
 	do_print(OPTIONS|FLYRECORD, "\"%s\" [name]\n", name);
 
@@ -567,20 +567,20 @@ static void dump_option_buffer(int fd, unsigned short option, int size)
 
 }
 
-static void dump_option_int(int fd, int size, char *desc)
+static void dump_option_int(int fd, unsigned int size, char *desc)
 {
 	int val;
 
-	do_print(OPTIONS, "\t\t[Option %s, %d bytes]\n", desc, size);
+	do_print(OPTIONS, "\t\t[Option %s, %u bytes]\n", desc, size);
 	read_file_number(fd, &val, size);
 	do_print(OPTIONS, "%d\n", val);
 }
 
-static void dump_option_xlong(int fd, int size, char *desc)
+static void dump_option_xlong(int fd, unsigned int size, char *desc)
 {
 	long long val;
 
-	do_print(OPTIONS, "\t\t[Option %s, %d bytes]\n", desc, size);
+	do_print(OPTIONS, "\t\t[Option %s, %u bytes]\n", desc, size);
 	read_file_number(fd, &val, size);
 	do_print(OPTIONS, "0x%llX\n", val);
 }
@@ -593,7 +593,7 @@ struct time_shift_cpu {
 	unsigned long long *times;
 };
 
-static void dump_option_timeshift(int fd, int size)
+static void dump_option_timeshift(int fd, unsigned int size)
 {
 	struct time_shift_cpu *cpus_data;
 	long long trace_id;
@@ -609,10 +609,10 @@ static void dump_option_timeshift(int fd, int size)
 	 * long long array of size [count] of timestamp offsets.
 	 */
 	if (size < 12) {
-		do_print(OPTIONS, "Broken time shift option, size %s", size);
+		do_print(OPTIONS, "Broken time shift option, size %u", size);
 		return;
 	}
-	do_print(OPTIONS, "\t\t[Option TimeShift, %d bytes]\n", size);
+	do_print(OPTIONS, "\t\t[Option TimeShift, %u bytes]\n", size);
 	read_file_number(fd, &trace_id, 8);
 	size -= 8;
 	do_print(OPTIONS, "0x%llX [peer's trace id]\n", trace_id);
@@ -691,7 +691,7 @@ out:
 	free(cpus_data);
 }
 
-void dump_option_guest(int fd, int size)
+void dump_option_guest(int fd, unsigned int size)
 {
 	unsigned long long trace_id;
 	char *buf, *p;
@@ -699,7 +699,7 @@ void dump_option_guest(int fd, int size)
 	int cpus;
 	int i;
 
-	do_print(OPTIONS, "\t\t[Option GUEST, %d bytes]\n", size);
+	do_print(OPTIONS, "\t\t[Option GUEST, %u bytes]\n", size);
 
 	/*
 	 * Guest name, null terminated string
@@ -750,12 +750,12 @@ out:
 	free(buf);
 }
 
-void dump_option_tsc2nsec(int fd, int size)
+void dump_option_tsc2nsec(int fd, unsigned int size)
 {
 	int mult, shift;
 	unsigned long long offset;
 
-	do_print(OPTIONS, "\n\t\t[Option TSC2NSEC, %d bytes]\n", size);
+	do_print(OPTIONS, "\n\t\t[Option TSC2NSEC, %u bytes]\n", size);
 
 	if (read_file_number(fd, &mult, 4))
 		die("cannot read tsc2nsec multiplier");
