@@ -431,7 +431,7 @@ static int ptp_clock_client(struct tracecmd_time_sync *tsync,
 	struct clock_sync_context *clock_context;
 	struct ptp_clock_offset_msg res_offset;
 	struct ptp_clock_start_msg start;
-	struct ptp_markers_context ctx;
+	struct ptp_markers_context ctx = {0};
 	struct ptp_clock_sync *ptp;
 	struct ptp_marker marker;
 	unsigned int sync_msg;
