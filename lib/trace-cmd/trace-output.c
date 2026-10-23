@@ -2857,7 +2857,6 @@ int tracecmd_write_cpu_data(struct tracecmd_output *handle,
 {
 	struct cpu_data_source *data;
 	struct stat st;
-	int size = 0;
 	int ret;
 	int i;
 
@@ -2882,7 +2881,6 @@ int tracecmd_write_cpu_data(struct tracecmd_output *handle,
 
 		data[i].size = st.st_size;
 		data[i].offset = 0;
-		size += st.st_size;
 	}
 
 	if (i < cpus)
