@@ -6281,7 +6281,8 @@ static void add_arg(struct buffer_instance *instance,
 		    int c, const char *opts,
 		    struct option *long_options, char *optarg)
 {
-	char *ptr, *arg;
+	const char *ptr;
+	char *arg;
 	int i, ret;
 
 	/* Short or long arg */
