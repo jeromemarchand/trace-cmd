@@ -215,7 +215,7 @@ unsigned long tracecmd_get_flags(struct tracecmd_input *handle);
 enum tracecmd_file_states tracecmd_get_file_state(struct tracecmd_input *handle);
 int tracecmd_enable_tsync(struct tracecmd_input *handle, bool enable);
 
-void tracecmd_parse_trace_clock(struct tracecmd_input *handle, char *file, int size);
+void tracecmd_parse_trace_clock(struct tracecmd_input *handle, char *file, size_t size);
 
 int tracecmd_make_pipe(struct tracecmd_input *handle, int cpu, int fd, int cpus);
 

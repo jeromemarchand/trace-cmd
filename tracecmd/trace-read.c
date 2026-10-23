@@ -1368,10 +1368,10 @@ static void parse_cpulist(const char *cpu_str)
 	} while (*s != '\0');
 }
 
-static void read_file_fd(int fd, char *dst, int len)
+static void read_file_fd(int fd, char *dst, size_t len)
 {
 	size_t size = 0;
-	int r;
+	ssize_t r;
 
 	do {
 		r = read(fd, dst+size, len);

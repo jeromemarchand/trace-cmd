@@ -41,7 +41,7 @@ struct tracecmd_compression {
 	void				*context;
 };
 
-static ssize_t read_fd(int fd, char *dst, int len)
+static ssize_t read_fd(int fd, char *dst, size_t len)
 {
 	size_t size = 0;
 	ssize_t r;

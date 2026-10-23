@@ -3699,7 +3699,7 @@ static void trace_guests_free(struct tracecmd_input *handle)
 	}
 }
 
-static int trace_guest_load(struct tracecmd_input *handle, char *buf, int size)
+static int trace_guest_load(struct tracecmd_input *handle, char *buf, size_t size)
 {
 	struct guest_trace_info *guest = NULL;
 	unsigned int cpu;
@@ -3911,7 +3911,7 @@ __hidden unsigned long long tcmd_get_last_option_offset(struct tracecmd_input *h
 	return handle->options_last_offset;
 }
 
-static int handle_option_done(struct tracecmd_input *handle, char *buf, int size)
+static int handle_option_done(struct tracecmd_input *handle, char *buf, size_t size)
 {
 	unsigned long long offset;
 
@@ -3932,7 +3932,7 @@ static int handle_option_done(struct tracecmd_input *handle, char *buf, int size
 	return handle_options(handle);
 }
 
-static inline int save_read_number(struct tep_handle *tep, char *data, int *data_size,
+static inline int save_read_number(struct tep_handle *tep, char *data, size_t *data_size,
 				   int *read_pos, int bytes, unsigned long long *num)
 {
 	if (bytes > *data_size)
@@ -3944,9 +3944,10 @@ static inline int save_read_number(struct tep_handle *tep, char *data, int *data
 	return 0;
 }
 
-static inline char *save_read_string(char *data, int *data_size, int *read_pos)
+static inline char *save_read_string(char *data, size_t *data_size, int *read_pos)
 {
 	char *str;
+	size_t len;
 
 	if (*data_size < 1)
 		return NULL;
@@ -3954,18 +3955,19 @@ static inline char *save_read_string(char *data, int *data_size, int *read_pos)
 	str = strdup(data + *read_pos);
 	if (!str)
 		return NULL;
-	*data_size -= (strlen(str) + 1);
-	if (*data_size < 0) {
+	len = strlen(str) + 1;
+	if (len > *data_size) {
 		free(str);
 		return NULL;
 	}
-	*read_pos += (strlen(str) + 1);
+	*data_size -= len;
+	*read_pos += len;
 
 	return str;
 }
 
 static int handle_buffer_option(struct tracecmd_input *handle,
-				unsigned short id, char *data, int size)
+				unsigned short id, char *data, size_t size)
 {
 	struct input_buffer_instance *buff;
 	struct cpu_file_data *cpu_data;
@@ -4073,7 +4075,8 @@ static int handle_options(struct tracecmd_input *handle)
 {
 	long long offset;
 	unsigned short option;
-	unsigned int size;
+	unsigned int size_u32;
+	size_t size;
 	unsigned short id, flags;
 	char *cpustats = NULL;
 	struct hook_list *hook;
@@ -4105,9 +4108,10 @@ static int handle_options(struct tracecmd_input *handle)
 			break;
 
 		/* next 4 bytes is the size of the option */
-		ret = read4(handle, &size);
+		ret = read4(handle, &size_u32);
 		if (ret)
 			goto out;
+		size = size_u32;
 		free(buf);
 		buf = malloc(size);
 		if (!buf) {
@@ -4646,7 +4650,7 @@ static void extract_trace_clock(struct tracecmd_input *handle, char *line)
 }
 
 void tracecmd_parse_trace_clock(struct tracecmd_input *handle,
-				char *file, int size __maybe_unused)
+				char *file, size_t size __maybe_unused)
 {
 	char *line;
 	char *next = NULL;
