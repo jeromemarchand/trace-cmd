@@ -4178,6 +4178,10 @@ static int handle_options(struct tracecmd_input *handle)
 			tracecmd_enable_tsync(handle, true);
 			break;
 		case TRACECMD_OPTION_CPUSTAT:
+			if (size == 0) {
+				ret = -EINVAL;
+				goto out;
+			}
 			buf[size-1] = '\n';
 			cpustats = realloc(handle->cpustats,
 					   handle->cpustats_size + size + 1);
@@ -4220,6 +4224,10 @@ static int handle_options(struct tracecmd_input *handle)
 			tep_set_cpus(handle->pevent, handle->cpus);
 			break;
 		case TRACECMD_OPTION_PROCMAPS:
+			if (size == 0) {
+				ret = -EINVAL;
+				goto out;
+			}
 			if (buf[size-1] == '\0')
 				trace_pid_map_load(handle, buf);
 			break;
