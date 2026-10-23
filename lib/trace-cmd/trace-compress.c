@@ -332,11 +332,10 @@ int tracecmd_compress_block(struct tracecmd_compression *handle)
 	if (!buf)
 		return -1;
 
-	real_size = handle->proto->compress_block(handle->context, handle->buffer, handle->pointer, buf, size);
-	if (real_size < 0) {
-		ret = real_size;
+	ret = handle->proto->compress_block(handle->context, handle->buffer, handle->pointer, buf, size);
+	if (ret < 0)
 		goto out;
-	}
+	real_size = ret;
 
 	/* Write compressed data size */
 	endian4 = tep_read_number(handle->tep, &real_size, 4);

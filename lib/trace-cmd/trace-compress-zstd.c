@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <zstd.h>
 #include <errno.h>
+#include <limits.h>
 
 #include "trace-cmd-private.h"
 
@@ -26,7 +27,7 @@ static int zstd_compress(void *ctx, const void *in, int in_bytes, void *out, int
 		return -1;
 
 	ret = ZSTD_compress2(context->ctx_c, out, out_bytes, in, in_bytes);
-	if (ZSTD_isError(ret))
+	if (ZSTD_isError(ret) || ret > INT_MAX)
 		return -1;
 
 	return ret;

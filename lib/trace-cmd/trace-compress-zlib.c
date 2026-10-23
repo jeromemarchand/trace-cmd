@@ -7,6 +7,7 @@
 #include <dlfcn.h>
 #include <zlib.h>
 #include <errno.h>
+#include <limits.h>
 
 #include "trace-cmd-private.h"
 
@@ -22,6 +23,10 @@ static int zlib_compress(void *ctx, const void *in, int in_bytes, void *out, int
 			(unsigned char *)in, (unsigned long)in_bytes, Z_BEST_COMPRESSION);
 	switch (ret) {
 	case Z_OK:
+		if (obytes > INT_MAX) {
+			errno = -ERANGE;
+			break;
+		}
 		return obytes;
 	case Z_BUF_ERROR:
 		errno = -ENOBUFS;
