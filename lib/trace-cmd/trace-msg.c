@@ -909,7 +909,7 @@ static int read_msg_data(struct tracecmd_msg_handle *msg_handle,
 
 	ret = tracecmd_msg_recv_wait(msg_handle->fd, msg);
 	if (ret < 0) {
-		tracecmd_warning("reading client %d (%s)", ret, strerror(ret));
+		tracecmd_warning("reading client %d (%s)", ret, strerror(-ret));
 		return ret;
 	}
 
