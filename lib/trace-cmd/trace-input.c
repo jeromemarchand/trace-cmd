@@ -4071,6 +4071,26 @@ fail:
 	return -1;
 }
 
+static int check_option(unsigned short option, char *buf, size_t size)
+{
+	struct option_type t;
+
+	if (option >= TRACECMD_OPTION_MAX)
+		return 0;
+	t = tracecmd_options[option];
+	if (t.size != TRACECMD_OPTION_SIZE_VARY && t.size != size)
+		return -EINVAL;
+
+	if(t.type == TRACECMD_OPTION_TYPE_STRING
+	   || t.type == TRACECMD_OPTION_TYPE_STRINGS) {
+		if (size == 0)
+			return -EINVAL;
+		buf[size-1] = '\0';
+	}
+
+	return 0;
+}
+
 static int handle_options(struct tracecmd_input *handle)
 {
 	long long offset;
@@ -4119,6 +4139,9 @@ static int handle_options(struct tracecmd_input *handle)
 			goto out;
 		}
 		ret = do_read_check(handle, buf, size);
+		if (ret)
+			goto out;
+		ret = check_option(option, buf, size);
 		if (ret)
 			goto out;
 
