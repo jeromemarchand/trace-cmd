@@ -608,7 +608,9 @@ static int ptp_clock_server(struct tracecmd_time_sync *tsync,
 					  sync_proto, &sync_msg,
 					  &size, (char **)&results);
 	if (ret || strncmp(sync_proto, PTP_NAME, TRACECMD_TSYNC_PNAME_LENGTH) ||
-	    sync_msg != PTP_SYNC_PKT_PROBES || size == 0 || results == NULL) {
+	    sync_msg != PTP_SYNC_PKT_PROBES ||
+	    size != sizeof(struct ptp_clock_result_msg) || results == NULL ||
+	    ntohl(results->count) > PTP_SYNC_LOOP) {
 		free(results);
 		return -1;
 	}
