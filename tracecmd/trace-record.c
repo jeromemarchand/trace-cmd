@@ -3908,7 +3908,8 @@ again:
 
 	if (sfd < 0) {
 		free(thost);
-		tracecmd_msg_handle_close(msg_handle);
+		if (msg_handle)
+			tracecmd_msg_handle_close(msg_handle);
 		return NULL;
 	}
 
